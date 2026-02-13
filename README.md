@@ -139,17 +139,17 @@ ollama serve              #Run
 
 Stop previous containers:
 
-docker compose down         #Run
+docker compose down                                      #Run
 
 
 Build backend:
 
-docker compose build backend     #Run
+docker compose build backend                            #Run
 
 
 Start backend:
 
-docker compose up               #Run
+docker compose up                                       #Run
 
 
 Backend runs at:
@@ -165,7 +165,7 @@ http://localhost:8000/docs
 
 Open new terminal:
 
-cd frontend                  #Run
+cd frontend                  
 npm install
 npm start
 
