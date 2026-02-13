@@ -1,0 +1,53 @@
+# ==============================
+# Python
+# ==============================
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.db
+*.sqlite3
+
+# ==============================
+# Environment Variables
+# ==============================
+.env
+
+# ==============================
+# Vector Databases
+# ==============================
+chroma_langchain_db/
+chrome_langchain_db/
+backend/data/chroma_db/
+data/chroma_db/
+
+# ==============================
+# Uploaded Documents (ignore actual files)
+# ==============================
+data/uploads/*
+backend/data/uploads/*
+!data/uploads/.gitkeep
+!backend/data/uploads/.gitkeep
+
+# ==============================
+# Node / React
+# ==============================
+node_modules/
+frontend/node_modules/
+
+# ==============================
+# OS Files
+# ==============================
+.DS_Store
+Thumbs.db
+
+# ==============================
+# Logs
+# ==============================
+*.log
+
+# ==============================
+# VS Code
+# ==============================
+.vscode/
