@@ -135,7 +135,27 @@ Start Ollama (if not auto-running):
 
 ollama serve              #Run
 
-🐳 Step 3: Start Backend (Docker)
+🔐 Step 2: Create Environment File (Required)
+
+Before starting Docker, create a .env file in the project root.
+
+You can copy the example file:
+
+copy .env.example .env
+
+
+(Windows)
+
+Or:
+
+cp .env.example .env
+
+
+(Mac/Linux)
+
+Then edit .env if needed.
+
+🐳 Step 4: Start Backend (Docker)
 
 Stop previous containers:
 
@@ -161,7 +181,7 @@ Check API docs:
 
 http://localhost:8000/docs
 
-🎨 Step 4: Start Frontend
+🎨 Step 5: Start Frontend
 
 Open new terminal:
 
