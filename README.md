@@ -114,44 +114,58 @@ Delete document button
 Chat interface
 
 
-⚙️ Complete Setup Guide (Backend + Frontend)
+⚙️ Complete Setup Guide (Actual Working Version)
+
 1️⃣ Clone Repository
 git clone https://github.com/IshaRoyxR/pdf-rag-gemini.git
 cd pdf-rag-gemini
 
-🖥 Backend Setup
+🧠 Step 2: Install and Run Ollama (Required)
 
-Step 1: Create Virtual Environment
-python -m venv venv
-venv\Scripts\activate        # Windows
-# source venv/bin/activate   # Mac/Linux
+Download Ollama from:
 
-Step 2: Install Dependencies
-pip install -r backend/requirements.txt
+https://ollama.com/download
 
-Step 3: Create Environment File
-Create a .env file in the root directory:
-GOOGLE_API_KEY=your_google_api_key
-MODEL_NAME=gemini-pro
+After installation, pull the model:
 
-Step 4: Run Backend Server
-uvicorn backend.app.main:app --reload
+ollama pull llama3       #Run
 
 
-Backend will run at:
-http://127.0.0.1:8000
+Start Ollama (if not auto-running):
+
+ollama serve              #Run
+
+🐳 Step 3: Start Backend (Docker)
+
+Stop previous containers:
+
+docker compose down         #Run
 
 
-You can check:
-http://127.0.0.1:8000/docs
+Build backend:
+
+docker compose build backend     #Run
 
 
-for Swagger API documentation.
+Start backend:
 
-🎨 Frontend Setup
+docker compose up               #Run
 
-Open a new terminal:
-cd frontend
+
+Backend runs at:
+
+http://localhost:8000
+
+
+Check API docs:
+
+http://localhost:8000/docs
+
+🎨 Step 4: Start Frontend
+
+Open new terminal:
+
+cd frontend                  #Run
 npm install
 npm start
 
@@ -160,10 +174,15 @@ Frontend runs at:
 
 http://localhost:3000
 
-
-Make sure backend is running before starting frontend.
-
-🐳 Docker Setup (Optional)
-
-To run full application using Docker:
-docker-compose up --build
+🧠 System Architecture (Your Real Setup)
+User
+   ↓
+React Frontend (localhost:3000)
+   ↓
+FastAPI Backend (Docker container)
+   ↓
+Ollama (Local Model Server)
+   ↓
+ChromaDB (Vector Store)
+   ↓
+Response to User
