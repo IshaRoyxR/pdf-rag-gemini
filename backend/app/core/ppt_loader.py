@@ -1,9 +1,8 @@
 from pptx import Presentation
 
 
-def load_ppt_text(file_path: str) -> str:
+def extract_text_from_ppt(file_path: str) -> str:
     prs = Presentation(file_path)
-
     text = ""
 
     for slide in prs.slides:

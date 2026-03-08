@@ -1,87 +1,154 @@
-import React, { useState, useEffect } from "react";
-
-const API = "http://localhost:8000/api";
+import React, { useState } from "react";
 
 function App() {
+
   const [file, setFile] = useState(null);
-  const [docs, setDocs] = useState([]);
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState("");
+  const [sources, setSources] = useState([]);
+  const [mode, setMode] = useState("chat");
+  const [provider, setProvider] = useState("gemini");
 
-  useEffect(() => {
-    fetchDocs();
-  }, []);
+  const uploadFile = async () => {
 
-  const fetchDocs = async () => {
-    const res = await fetch(`${API}/documents`);
-    const data = await res.json();
-    setDocs(data);
-  };
+    if (!file) {
+      alert("Please select a file first");
+      return;
+    }
 
-  const upload = async () => {
-    const form = new FormData();
-    form.append("file", file);
+    const formData = new FormData();
+    formData.append("file", file);
 
-    await fetch(`${API}/documents/upload`, {
+    await fetch("http://localhost:8000/api/upload", {
       method: "POST",
-      body: form
+      body: formData
     });
 
-    fetchDocs();
+    alert("File uploaded successfully!");
   };
 
-  const ask = async () => {
-    const res = await fetch(`${API}/chat/query`, {
+
+  const askQuestion = async () => {
+
+    const res = await fetch("http://localhost:8000/api/chat", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ question })
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        question,
+        mode,
+        provider
+      })
     });
 
     const data = await res.json();
-    setAnswer(data.answer);
+
+    // convert answer safely to text
+    let textAnswer = "";
+
+    if (typeof data.answer === "string") {
+      textAnswer = data.answer;
+    } 
+    else if (data.answer?.text) {
+      textAnswer = data.answer.text;
+    } 
+    else {
+      textAnswer = JSON.stringify(data.answer);
+    }
+
+    setAnswer(textAnswer);
+    setSources(data.sources || []);
   };
 
-  const deleteDoc = async (id) => {
-    await fetch(`${API}/documents/${id}`, {
-      method: "DELETE"
-    });
-
-    fetchDocs();
-  };
 
   return (
-    <div style={{ padding: 40 }}>
+    <div style={{ padding: 20, fontFamily: "Arial" }}>
 
-      <h1>Phase 2 – Multi File RAG</h1>
+      <h2>📚 Multi File RAG</h2>
 
+      {/* Upload */}
       <input
         type="file"
         onChange={(e) => setFile(e.target.files[0])}
       />
 
-      <button onClick={upload}>Upload</button>
+      <button onClick={uploadFile}>
+        Upload
+      </button>
 
-      <h3>Documents</h3>
+      <br /><br />
 
-      {Object.entries(docs).map(([id, doc]) => (
-        <div key={id}>
-          📄 {doc.filename} – {doc.status}
-          <button onClick={() => deleteDoc(id)}>Delete</button>
-        </div>
-      ))}
+      {/* Provider */}
+      Provider:
+      <select
+        value={provider}
+        onChange={(e) => setProvider(e.target.value)}
+      >
+        <option value="gemini">Gemini</option>
+        <option value="openai">OpenAI</option>
+        <option value="ollama">Ollama</option>
+      </select>
 
-      <hr />
+      <br /><br />
 
+      {/* Mode */}
+      Mode:
+      <select
+        value={mode}
+        onChange={(e) => setMode(e.target.value)}
+      >
+        <option value="chat">Chat</option>
+        <option value="qa">Q&A</option>
+        <option value="summary">Summary</option>
+        <option value="completion">Completion</option>
+      </select>
+
+      <br /><br />
+
+      {/* Question */}
       <input
+        style={{ width: "400px" }}
+        placeholder="Ask a question..."
         value={question}
         onChange={(e) => setQuestion(e.target.value)}
       />
 
-      <button onClick={ask}>Ask</button>
+      <button onClick={askQuestion}>
+        Ask
+      </button>
 
-      <h3>Answer</h3>
+      {/* Answer section (only show when answer exists) */}
 
-      <p>{answer}</p>
+      {answer && (
+        <>
+          <h3>Answer</h3>
+          <p>{answer}</p>
+        </>
+      )}
+
+      {/* Sources section (ONLY if sources exist) */}
+
+      {sources.length > 0 && (
+        <>
+          <h3>Sources</h3>
+
+          {sources.map((s, i) => (
+            <div
+              key={i}
+              style={{
+                marginBottom: 10,
+                background: "#f3f3f3",
+                padding: 10
+              }}
+            >
+              <b>{s.file}</b> (Page {s.page}) — {s.score}%
+              <br />
+              <i>{s.excerpt}</i>
+            </div>
+          ))}
+        </>
+      )}
 
     </div>
   );

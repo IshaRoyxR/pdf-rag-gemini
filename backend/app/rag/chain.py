@@ -1,45 +1,83 @@
-from langchain_ollama import OllamaLLM
-from langchain_core.prompts import ChatPromptTemplate
-from app.rag.vector_store import get_retriever
+from .retriever import retrieve_docs
+from .providers.factory import get_provider
 
 
-def run_rag(question: str) -> str:
-    retriever = get_retriever(k=8)
+def build_prompt(context: str, question: str, mode: str):
 
-    # Retrieve relevant chunks
-    docs = retriever.invoke(question)
+    if mode == "summary":
+        return f"Summarize this briefly:\n{context}"
 
-    if not docs or len(docs) == 0:
-        return "No relevant information found in uploaded documents."
+    elif mode == "qa":
+        return f"""Answer using ONLY the context below.
 
-    context = "\n\n".join(d.page_content for d in docs)
-
-    prompt = ChatPromptTemplate.from_template("""
-You are an intelligent assistant answering questions ONLY from uploaded documents.
-
-RULES:
-- Answer ONLY using the context provided.
-- Ignore any document that is not relevant to the question.
-- If the context does NOT contain the answer, say exactly: "I don't know".
-- If the question has multiple parts, answer each part clearly.
-
-Relevant Context:
+Context:
 {context}
 
-User Question:
-{question}
+Question: {question}
+"""
 
-Final Answer:
-""")
+    elif mode == "completion":
+        return f"Continue this text:\n{question}"
 
-    llm = OllamaLLM(
-        model="llama3",
-        base_url="http://host.docker.internal:11434"
-    )
+    else:
+        return f"""Use the following context to respond.
 
-    chain = prompt | llm
+Context:
+{context}
 
-    return chain.invoke({
-        "context": context,
-        "question": question
-    })
+User: {question}
+"""
+
+
+def generate_answer(question: str, mode: str, provider_name: str):
+
+    docs = retrieve_docs(question)
+
+    if not docs:
+        return {
+            "answer": "Your question is outside the context of the uploaded document.",
+            "sources": []
+        }
+
+    similarities = []
+
+    for d in docs:
+        distance = d.metadata.get("score", 1)
+        similarity = 1 - distance
+        similarities.append(similarity)
+
+    best_similarity = max(similarities)
+
+    # 🔥 Improved out-of-context detection
+    if best_similarity < 0.65:
+        return {
+            "answer": "Your question is outside the context of the uploaded document.",
+            "sources": []
+        }
+
+    context = "\n\n".join([d.page_content for d in docs])
+
+    prompt = build_prompt(context, question, mode)
+
+    provider = get_provider(provider_name)
+
+    answer = provider.generate(prompt)
+
+    sources = []
+
+    for d in docs:
+
+        distance = d.metadata.get("score", 1)
+        similarity = (1 - distance) * 100
+
+        sources.append({
+            "file": d.metadata.get("source"),
+            "page": d.metadata.get("page"),
+            "score": round(similarity, 2),
+            "excerpt": d.page_content[:120]
+        })
+
+    return {
+        "answer": answer,
+        "sources": sources
+    }

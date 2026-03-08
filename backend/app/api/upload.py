@@ -1,27 +1,38 @@
-from fastapi import APIRouter, UploadFile, File
-from app.core.file_router import extract_text_by_type
-from app.core.text_splitter import split_text
+from fastapi import APIRouter, UploadFile, File, HTTPException
+import os
+from app.rag.loader import load_document
+from app.rag.splitter import split_text
 from app.rag.vector_store import store_chunks
-from app.core.document_status import add_document
 
 router = APIRouter()
 
-@router.post("/documents/upload")
-async def upload_document(file: UploadFile = File(...)):
-    file_path = f"data/uploads/{file.filename}"
+UPLOAD_DIR = "data/uploads"
+os.makedirs(UPLOAD_DIR, exist_ok=True)
+
+
+@router.post("/upload")
+async def upload_file(file: UploadFile = File(...)):
+    # ❌ Prevent empty upload
+    if not file.filename:
+        raise HTTPException(status_code=400, detail="No file selected")
+
+    # Save file
+    file_path = os.path.join(UPLOAD_DIR, file.filename)
 
     with open(file_path, "wb") as f:
-        f.write(await file.read())
+        content = await file.read()
+        f.write(content)
 
-    text = extract_text_by_type(file_path)
+    # Load document text
+    text = load_document(file_path)
 
+    if not text:
+        raise HTTPException(status_code=400, detail="Failed to read document")
+
+    # Split into chunks
     chunks = split_text(text)
 
-    store_chunks(chunks, source=file.filename)
+    # Store in vector DB
+    store_chunks(chunks, file.filename)
 
-    add_document(file.filename)
-
-    return {
-        "id": file.filename,
-        "status": "processed"
-    }
+    return {"status": "uploaded", "file": file.filename}

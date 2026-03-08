@@ -1,40 +1,36 @@
-from langchain_community.llms import Ollama
-from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.output_parsers import StrOutputParser
+from langchain_ollama import ChatOllama
+from app.rag.vector_store import get_retriever
 
-from app.rag.vector_store import get_vector_store
+# LLM
+llm = ChatOllama(
+    model="llama3",
+    base_url="http://host.docker.internal:11434",
+    temperature=0
+)
 
 
-def run_rag(question: str) -> str:
-    vectordb = get_vector_store()
-    retriever = vectordb.as_retriever(search_kwargs={"k": 4})
+def ask_rag(question: str) -> str:
+    retriever = get_retriever()
+    docs = retriever.invoke(question)
 
-    docs = retriever.get_relevant_documents(question)
-    context = "\n\n".join(d.page_content for d in docs)
+    if not docs:
+        return "No relevant context found in documents."
 
-    prompt = ChatPromptTemplate.from_template(
-        """
+    context = "\n\n".join([d.page_content for d in docs])
+
+    prompt = f"""
 You are a helpful assistant.
-Answer the question ONLY using the context below.
-If the answer is not in the context, say "I don't know".
+Answer ONLY using the provided context.
 
 Context:
 {context}
 
 Question:
 {question}
+
+Answer:
 """
-    )
 
-    llm = Ollama(model="llama3")
+    response = llm.invoke(prompt)
 
-    chain = (
-        prompt
-        | llm
-        | StrOutputParser()
-    )
-
-    return chain.invoke({
-        "context": context,
-        "question": question
-    })
+    return response.content

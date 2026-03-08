@@ -1,15 +1,22 @@
-import os
-from langchain_community.document_loaders import PyPDFLoader
+from app.core.pdf_loader import extract_text_from_pdf
+from app.core.docx_loader import extract_text_from_docx
+from app.core.ppt_loader import extract_text_from_ppt
 
 
-def load_document(file_path: str):
-    if not file_path.lower().endswith(".pdf"):
-        raise ValueError("Only PDF files are supported")
+def load_document(path: str) -> str:
+    path_lower = path.lower()
 
-    loader = PyPDFLoader(file_path)
-    documents = loader.load()
+    if path_lower.endswith(".pdf"):
+        text = extract_text_from_pdf(path)
+    elif path_lower.endswith(".docx"):
+        text = extract_text_from_docx(path)
+    elif path_lower.endswith(".pptx"):
+        text = extract_text_from_ppt(path)
+    else:
+        raise ValueError("Unsupported file type")
 
-    for doc in documents:
-        doc.metadata["source"] = os.path.basename(file_path)
+    # Ensure string
+    if isinstance(text, list):
+        return "\n".join(text)
 
-    return documents
+    return text
