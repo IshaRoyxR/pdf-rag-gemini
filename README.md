@@ -1,208 +1,265 @@
-📄 PDF RAG System (Multi-Format Document Intelligence)
+# 📄 PDF RAG System (Multi-Format Document Intelligence)
 
 A full-stack Retrieval-Augmented Generation (RAG) system that allows users to upload documents (PDF, Word, PowerPoint) and ask intelligent questions based on their content.
 
-Built using FastAPI, LangChain, ChromaDB, Gemini/Ollama, and React.
+Built using FastAPI, LangChain, ChromaDB, Gemini/Ollama/OpenAI, and React.
 
-🎯 Why This Project?
+---
+
+# 🎯 Why This Project?
 
 Modern applications require intelligent document understanding.
 
 This project demonstrates:
 
-How to build a complete RAG pipeline
+- How to build a complete RAG pipeline
+- How to process multiple document formats
+- How to store semantic embeddings in a vector database
+- How to retrieve relevant context for LLMs
+- How to build a full backend + frontend system
+- How to structure a production-ready project
+- How to support multiple LLM providers dynamically
+- How to implement conversational memory in document QA systems
 
-How to process multiple document formats
+This is not just a demo — it is a complete intelligent document Q&A system.
 
-How to store semantic embeddings in a vector database
+---
 
-How to retrieve relevant context for LLMs
+# 🧠 How It Works (Architecture Flow)
 
-How to build a full backend + frontend system
+User  
+│  
+▼  
+React Frontend (Upload / Chat UI)  
+│  
+▼  
+FastAPI Backend  
+│  
+├── File Router  
+│      ├── PDF Loader  
+│      ├── DOCX Loader  
+│      └── PPT Extractor  
+│  
+▼  
+Text Splitter  
+│  
+▼  
+Embedding Generator (Ollama / OpenAI / Gemini)  
+│  
+▼  
+ChromaDB (Vector Store)  
+│  
+▼  
+Retriever  
+│  
+▼  
+LLM Provider Layer  
+│      ├── Ollama  
+│      ├── OpenAI  
+│      └── Gemini  
+│  
+▼  
+Conversation Memory + Context  
+│  
+▼  
+Final Answer Returned to User (with Sources)
 
-How to structure a production-ready project
+---
 
-This is not just a demo — it is a complete document Q&A system.
+# 🏗 Project Architecture
 
-🧠 How It Works (Architecture Flow)
-User
-  │
-  ▼
-React Frontend (Upload / Chat UI)
-  │
-  ▼
-FastAPI Backend
-  │
-  ├── File Router
-  │      ├── PDF Loader
-  │      ├── DOCX Loader
-  │      └── PPT Extractor
-  │
-  ▼
-Text Splitter
-  │
-  ▼
-Embedding Generator (Gemini / Ollama)
-  │
-  ▼
-ChromaDB (Vector Store)
-  │
-  ▼
-Retriever
-  │
-  ▼
-LLM (Gemini / Ollama)
-  │
-  ▼
-Final Answer Returned to User
 
-🏗 Project Architecture
 pdf-rag-gemini/
 │
 ├── backend/
-│   ├── app/
-│   │   ├── api/        # API endpoints
-│   │   ├── core/       # File handling & utilities
-│   │   ├── rag/        # RAG pipeline logic
-│   │   ├── llm/        # LLM integrations
-│   │   └── main.py     # FastAPI entry point
-│   └── requirements.txt
+│ ├── app/
+│ │ ├── api/ # API endpoints
+│ │ ├── core/ # File handling & utilities
+│ │ ├── rag/ # RAG pipeline logic
+│ │ ├── memory/ # Conversation memory
+│ │ ├── providers/ # LLM provider implementations
+│ │ └── main.py # FastAPI entry point
+│ └── requirements.txt
 │
 ├── frontend/
-│   ├── src/
-│   └── public/
+│ ├── src/
+│ │ ├── components/
+│ │ └── layouts/
+│ └── public/
 │
 ├── data/
-│   ├── uploads/        # Uploaded files
-│   └── chroma_db/      # Vector DB (auto-generated)
+│ ├── uploads/
+│ ├── conversations/
+│ └── chroma_db/
 │
 ├── docker-compose.yml
 ├── .env.example
 └── README.md
 
-🚀 Features
-Backend
 
-Multi-format support (PDF, DOCX, PPT)
+---
 
-Automatic file type detection
+# 🚀 Features
 
-Background processing
+### Backend
 
-Status tracking
+- Multi-format document support (PDF, DOCX, PPT)
+- PowerPoint extraction using **python-pptx**
+- Word document extraction using **python-docx**
+- Automatic file type detection and routing
+- Background document processing with status tracking
+- Vector database persistence using **ChromaDB**
+- Retrieval-Augmented Generation (RAG) pipeline
+- Document metadata tracking (page / slide numbers)
+- Relevance score calculation for retrieved results
+- Source extraction and excerpt generation from documents
+- Conversation memory using **LangChain ConversationBufferWindowMemory**
+- File-based conversation persistence
+- Conversation CRUD API endpoints
+- Document list endpoint (`GET /api/documents`)
+- Document delete endpoint (`DELETE /api/documents/{id}`)
+- Multiple interaction modes (Q&A, Summary, Completion)
+- Mode-specific prompt templates
+- Provider-based LLM architecture
+- Support for multiple LLM providers:
+  - Ollama
+  - OpenAI
+  - Gemini
+- Provider factory pattern for dynamic provider selection
+- Environment-based provider configuration
 
-Vector database persistence (ChromaDB)
+### Frontend
 
-REST API endpoints
+- Drag-and-drop document upload interface
+- Upload progress indicator
+- Document list view with processing status
+- File type icons (PDF/PPT/DOC)
+- Delete document functionality
+- Chat interface for document questions
+- Conversation session management
+- Sidebar conversation list
+- Switch between conversations
+- Conversation history display
+- New conversation creation
+- Delete conversation option
+- Multiple interaction mode selector
+- UI indicators for selected mode
+- Source citation display
+- Document name and page/slide reference display
+- Relevance score visualization
+- Provider status indicator
+- Active model/provider display
 
-Document list & delete endpoints
+---
 
-Gemini and Ollama support
+# ⚙️ Complete Setup Guide (Actual Working Version)
 
-Frontend
-
-Drag-and-drop upload
-
-Upload progress tracking
-
-Document library view
-
-File-type icons
-
-Delete document button
-
-Chat interface
+## 1️⃣ Clone Repository
 
 
-⚙️ Complete Setup Guide (Actual Working Version)
-
-1️⃣ Clone Repository
 git clone https://github.com/IshaRoyxR/pdf-rag-gemini.git
+
 cd pdf-rag-gemini
 
-🧠 Step 2: Install and Run Ollama (Required)
 
-Download Ollama from:
+---
+
+# 🧠 Step 2: Install and Run Ollama (Required)
+
+Download Ollama:
 
 https://ollama.com/download
 
-After installation, pull the model:
-
-ollama pull llama3       #Run
+Pull the model:
 
 
-Start Ollama (if not auto-running):
+ollama pull llama3
 
-ollama serve              #Run
 
-🔐 Step 2: Create Environment File (Required)
+Start Ollama if needed:
 
-Before starting Docker, create a .env file in the project root.
 
-You can copy the example file:
+ollama serve
+
+
+---
+
+# 🔐 Step 3: Create Environment File
+
+Before starting Docker, create a `.env` file in the project root.
+
 
 copy .env.example .env
 
 
-(Windows)
+Edit `.env` if needed.
 
-Or:
+---
 
-cp .env.example .env
-
-
-(Mac/Linux)
-
-Then edit .env if needed.
-
-🐳 Step 4: Start Backend (Docker)
+# 🐳 Step 4: Start Backend (Docker)
 
 Stop previous containers:
 
-docker compose down                                      #Run
+
+docker compose down
 
 
 Build backend:
 
-docker compose build backend                            #Run
+
+docker compose build backend
 
 
 Start backend:
 
-docker compose up                                       #Run
+
+docker compose up
 
 
 Backend runs at:
 
+
 http://localhost:8000
 
 
-Check API docs:
+Check API documentation:
+
 
 http://localhost:8000/docs
 
-🎨 Step 5: Start Frontend
 
-Open new terminal:
+---
 
-cd frontend                  
+# 🎨 Step 5: Start Frontend
+
+Open a new terminal:
+
+
+cd frontend
 npm install
 npm start
 
 
 Frontend runs at:
 
+
 http://localhost:3000
 
-🧠 System Architecture (Your Real Setup)
-User
-   ↓
-React Frontend (localhost:3000)
-   ↓
-FastAPI Backend (Docker container)
-   ↓
-Ollama (Local Model Server)
-   ↓
-ChromaDB (Vector Store)
-   ↓
-Response to User
+
+---
+
+# 🧠 System Architecture (Runtime Flow)
+
+User  
+↓  
+React Frontend (localhost:3000)  
+↓  
+FastAPI Backend (Docker container)  
+↓  
+Retriever + Conversation Memory  
+↓  
+LLM Provider (Ollama / OpenAI / Gemini)  
+↓  
+ChromaDB Vector Store  
+↓  
+Answer with Source Citations
