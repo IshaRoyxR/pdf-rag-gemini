@@ -1,265 +1,267 @@
-# 📄 PDF RAG System (Multi-Format Document Intelligence)
+# PDF RAG System — Multi-Format Intelligent Document Understanding Platform
 
-A full-stack Retrieval-Augmented Generation (RAG) system that allows users to upload documents (PDF, Word, PowerPoint) and ask intelligent questions based on their content.
+A production-ready full-stack Retrieval-Augmented Generation (RAG) platform that enables users to upload PDF, DOCX, and PowerPoint documents and interact with them using context-aware AI conversations.
 
-Built using FastAPI, LangChain, ChromaDB, Gemini/Ollama/OpenAI, and React.
-
----
-
-# 🎯 Why This Project?
-
-Modern applications require intelligent document understanding.
-
-This project demonstrates:
-
-- How to build a complete RAG pipeline
-- How to process multiple document formats
-- How to store semantic embeddings in a vector database
-- How to retrieve relevant context for LLMs
-- How to build a full backend + frontend system
-- How to structure a production-ready project
-- How to support multiple LLM providers dynamically
-- How to implement conversational memory in document QA systems
-
-This is not just a demo — it is a complete intelligent document Q&A system.
+Built using FastAPI, LangChain, ChromaDB, React, Docker, Ollama, OpenAI, and Gemini.
 
 ---
 
-# 🧠 How It Works (Architecture Flow)
+# Overview
 
-User  
-│  
-▼  
-React Frontend (Upload / Chat UI)  
-│  
-▼  
-FastAPI Backend  
-│  
-├── File Router  
-│      ├── PDF Loader  
-│      ├── DOCX Loader  
-│      └── PPT Extractor  
-│  
-▼  
-Text Splitter  
-│  
-▼  
-Embedding Generator (Ollama / OpenAI / Gemini)  
-│  
-▼  
-ChromaDB (Vector Store)  
-│  
-▼  
-Retriever  
-│  
-▼  
-LLM Provider Layer  
-│      ├── Ollama  
-│      ├── OpenAI  
-│      └── Gemini  
-│  
-▼  
-Conversation Memory + Context  
-│  
-▼  
-Final Answer Returned to User (with Sources)
+This project demonstrates how modern AI systems combine:
+- semantic retrieval
+- vector databases
+- conversational memory
+- multi-provider LLM orchestration
+- scalable backend architecture
+
+to build intelligent document understanding systems.
+
+Instead of building a basic chatbot wrapper, this project focuses on production-oriented AI infrastructure and full-stack engineering principles.
 
 ---
 
-# 🏗 Project Architecture
+# Core Capabilities
 
+- Multi-format document ingestion (PDF, DOCX, PPT/PPTX)
+- Retrieval-Augmented Generation (RAG)
+- Semantic search using vector embeddings
+- Context-aware conversational AI
+- Multi-provider LLM integration
+- Source-cited answer generation
+- Conversational memory support
+- Modular backend architecture
+- Dockerized full-stack deployment
+- Production-ready API workflows
 
+---
+
+# System Architecture
+
+```text
+User
+│
+▼
+React + Vite Frontend
+│
+▼
+FastAPI Backend
+│
+├── Document Processing Pipeline
+│ ├── PDF Loader
+│ ├── DOCX Loader
+│ └── PPT Extractor
+│
+▼
+Text Chunking + Embedding Generation
+│
+▼
+ChromaDB Vector Store
+│
+▼
+Semantic Retriever
+│
+▼
+LLM Provider Layer
+│ ├── Ollama
+│ ├── OpenAI
+│ └── Gemini
+│
+▼
+Conversation Memory + Context Injection
+│
+▼
+Grounded AI Response with Source Citations
+```
+
+---
+
+# Tech Stack
+
+## Backend
+- FastAPI
+- LangChain
+- ChromaDB
+- Python
+- Docker
+- Ollama
+- OpenAI API
+- Gemini API
+
+## Frontend
+- React
+- Vite
+- TypeScript
+- Tailwind CSS
+- shadcn/ui
+
+---
+
+# Key Engineering Features
+
+## AI / RAG Features
+- Retrieval-Augmented Generation (RAG)
+- Semantic similarity search
+- Embedding-based retrieval
+- Conversational memory
+- Multi-turn contextual Q&A
+- Source-aware answer generation
+- Relevance scoring
+- Multi-provider LLM orchestration
+
+## Backend Engineering
+- Modular FastAPI architecture
+- Async API workflows
+- Background document processing
+- Provider abstraction layer
+- Factory design pattern
+- Environment-based configuration
+- Production-ready Docker setup
+
+## Frontend Features
+- Modern React + Vite UI
+- Drag-and-drop document upload
+- Conversation session management
+- Multi-mode AI interaction
+- Source citation display
+- Provider selection interface
+- Responsive UI components
+
+---
+
+# Supported LLM Providers
+
+- Ollama
+- OpenAI
+- Gemini
+
+The provider layer is dynamically configurable and supports switching between local and cloud-hosted LLMs.
+
+---
+
+# Project Structure
+
+```text
 pdf-rag-gemini/
 │
 ├── backend/
-│ ├── app/
-│ │ ├── api/ # API endpoints
-│ │ ├── core/ # File handling & utilities
-│ │ ├── rag/ # RAG pipeline logic
-│ │ ├── memory/ # Conversation memory
-│ │ ├── providers/ # LLM provider implementations
-│ │ └── main.py # FastAPI entry point
-│ └── requirements.txt
+│   ├── app/
+│   │   ├── api/
+│   │   ├── rag/
+│   │   ├── providers/
+│   │   ├── memory/
+│   │   └── main.py
+│   │
+│   └── requirements.txt
 │
 ├── frontend/
-│ ├── src/
-│ │ ├── components/
-│ │ └── layouts/
-│ └── public/
+│   ├── src/
+│   ├── public/
+│   └── components/
 │
 ├── data/
-│ ├── uploads/
-│ ├── conversations/
-│ └── chroma_db/
-│
 ├── docker-compose.yml
 ├── .env.example
+├── LICENSE
 └── README.md
-
-
----
-
-# 🚀 Features
-
-### Backend
-
-- Multi-format document support (PDF, DOCX, PPT)
-- PowerPoint extraction using **python-pptx**
-- Word document extraction using **python-docx**
-- Automatic file type detection and routing
-- Background document processing with status tracking
-- Vector database persistence using **ChromaDB**
-- Retrieval-Augmented Generation (RAG) pipeline
-- Document metadata tracking (page / slide numbers)
-- Relevance score calculation for retrieved results
-- Source extraction and excerpt generation from documents
-- Conversation memory using **LangChain ConversationBufferWindowMemory**
-- File-based conversation persistence
-- Conversation CRUD API endpoints
-- Document list endpoint (`GET /api/documents`)
-- Document delete endpoint (`DELETE /api/documents/{id}`)
-- Multiple interaction modes (Q&A, Summary, Completion)
-- Mode-specific prompt templates
-- Provider-based LLM architecture
-- Support for multiple LLM providers:
-  - Ollama
-  - OpenAI
-  - Gemini
-- Provider factory pattern for dynamic provider selection
-- Environment-based provider configuration
-
-### Frontend
-
-- Drag-and-drop document upload interface
-- Upload progress indicator
-- Document list view with processing status
-- File type icons (PDF/PPT/DOC)
-- Delete document functionality
-- Chat interface for document questions
-- Conversation session management
-- Sidebar conversation list
-- Switch between conversations
-- Conversation history display
-- New conversation creation
-- Delete conversation option
-- Multiple interaction mode selector
-- UI indicators for selected mode
-- Source citation display
-- Document name and page/slide reference display
-- Relevance score visualization
-- Provider status indicator
-- Active model/provider display
+```
 
 ---
 
-# ⚙️ Complete Setup Guide (Actual Working Version)
+# Setup Guide
 
-## 1️⃣ Clone Repository
+## 1. Clone Repository
 
-
+```bash
 git clone https://github.com/IshaRoyxR/pdf-rag-gemini.git
 
 cd pdf-rag-gemini
-
+```
 
 ---
 
-# 🧠 Step 2: Install and Run Ollama (Required)
+## 2. Install Ollama
 
-Download Ollama:
-
+Download:
 https://ollama.com/download
 
-Pull the model:
+Pull model:
 
-
+```bash
 ollama pull llama3
+```
 
+Start Ollama:
 
-Start Ollama if needed:
-
-
+```bash
 ollama serve
-
+```
 
 ---
 
-# 🔐 Step 3: Create Environment File
+## 3. Configure Environment Variables
 
-Before starting Docker, create a `.env` file in the project root.
+Create `.env` file:
 
-
+```bash
 copy .env.example .env
+```
 
-
-Edit `.env` if needed.
+Update API keys if required.
 
 ---
 
-# 🐳 Step 4: Start Backend (Docker)
+# 4. Start Full Stack Application
 
-Stop previous containers:
+```bash
+docker compose up --build
+```
 
+---
 
-docker compose down
+# Application URLs
 
+Frontend:
+```text
+http://localhost:8080
+```
 
-Build backend:
-
-
-docker compose build backend
-
-
-Start backend:
-
-
-docker compose up
-
-
-Backend runs at:
-
-
+Backend:
+```text
 http://localhost:8000
+```
 
-
-Check API documentation:
-
-
+Swagger API Docs:
+```text
 http://localhost:8000/docs
-
-
----
-
-# 🎨 Step 5: Start Frontend
-
-Open a new terminal:
-
-
-cd frontend
-npm install
-npm start
-
-
-Frontend runs at:
-
-
-http://localhost:3000
-
+```
 
 ---
 
-# 🧠 System Architecture (Runtime Flow)
+# Example Use Cases
 
-User  
-↓  
-React Frontend (localhost:3000)  
-↓  
-FastAPI Backend (Docker container)  
-↓  
-Retriever + Conversation Memory  
-↓  
-LLM Provider (Ollama / OpenAI / Gemini)  
-↓  
-ChromaDB Vector Store  
-↓  
-Answer with Source Citations
+- AI document assistants
+- Enterprise knowledge retrieval
+- Research paper Q&A systems
+- Internal AI copilots
+- Technical documentation assistants
+- Conversational knowledge systems
+
+---
+
+# Future Improvements
+
+- Hybrid search (BM25 + vector search)
+- Authentication & user management
+- Streaming LLM responses
+- Multi-document reasoning
+- Kubernetes deployment
+- Redis caching
+- Cloud deployment support
+- Agentic workflows
+
+---
+
+# License
+
+Apache License 2.0
