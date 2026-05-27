@@ -1,41 +1,71 @@
-from typing import List, Dict, Any
-import os
-from langchain_core.documents import Document
 from langchain_chroma import Chroma
 from langchain_ollama import OllamaEmbeddings
+from langchain_core.documents import Document
 
-CHROMA_DIR = "data/chroma_db"
-COLLECTION_NAME = "documents"
+# Folder where the vector DB will be stored
+PERSIST_DIR = "chroma_db"
 
-os.makedirs(CHROMA_DIR, exist_ok=True)
-
-embeddings = OllamaEmbeddings(
+# Ollama embedding model
+embedding = OllamaEmbeddings(
     model="nomic-embed-text",
-    base_url=os.getenv("OLLAMA_BASE_URL", "http://host.docker.internal:11434")
+    base_url="http://127.0.0.1:11434"
 )
 
+# Create / load Chroma vector database
 vector_store = Chroma(
-    collection_name=COLLECTION_NAME,
-    persist_directory=CHROMA_DIR,
-    embedding_function=embeddings,
+    persist_directory=PERSIST_DIR,
+    embedding_function=embedding
 )
 
-def store_chunks(chunks: List[Dict[str, Any]], source: str):
+
+def store_chunks(chunks, filename):
+    """
+    Store document chunks into the vector database.
+    """
+
     docs = []
+
     for chunk in chunks:
-        docs.append(
-            Document(
-                page_content=chunk["text"],
-                metadata={
-                    "source": source,
-                    "page": chunk.get("page", 0),
-                },
-            )
+        text = chunk["text"]
+        page = chunk.get("page", 0)
+
+        doc = Document(
+            page_content=text,
+            metadata={
+                "source": filename,   # 🔥 IMPORTANT (used for delete)
+                "page": page
+            }
         )
+
+        docs.append(doc)
+
+    # ✅ Add to vector DB
     vector_store.add_documents(docs)
 
-def get_retriever(k: int = 5):
-    return vector_store.as_retriever(search_kwargs={"k": k})
 
-def similarity_search(query: str, k: int = 5):
-    return vector_store.similarity_search_with_score(query, k=k)
+def get_retriever():
+    """
+    Returns retriever for the RAG pipeline.
+    """
+
+    return vector_store.as_retriever(
+        search_type="similarity",
+        search_kwargs={"k": 4}
+    )
+
+
+# ✅ DELETE FUNCTION (FINAL FIX)
+def delete_from_vector_store(filename: str):
+    """
+    Delete all embeddings related to a file
+    """
+
+    try:
+        vector_store._collection.delete(
+            where={"source": filename}
+        )
+
+        print(f"Deleted embeddings for {filename}")
+
+    except Exception as e:
+        print("Error deleting from vector DB:", e)

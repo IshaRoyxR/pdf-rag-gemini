@@ -1,83 +1,113 @@
-from .retriever import retrieve_docs
-from .providers.factory import get_provider
+from app.rag.retriever import retrieve_docs
+from app.rag.providers.factory import get_provider
 
 
-def build_prompt(context: str, question: str, mode: str):
+def generate_answer(
+    question: str,
+    mode: str = "qa",
+    provider_name: str = "gemini",
+    filename: str = None
+):
 
-    if mode == "summary":
-        return f"Summarize this briefly:\n{context}"
+    try:
+        # ✅ Retrieve documents (WITH FILE FILTER)
+        if filename:
+            docs = retrieve_docs(question, filename=filename)
+        else:
+            docs = retrieve_docs(question)
 
-    elif mode == "qa":
-        return f"""Answer using ONLY the context below.
+        # ✅ No docs found
+        if not docs:
+            return {
+                "answer": "No relevant information found in the selected document.",
+                "source": None,
+                "score": 0.0
+            }
+
+        # 🔥 LIMIT CONTEXT (CRITICAL FIX FOR OLLAMA)
+        limited_docs = docs[:2]   # 👈 prevents overload/crash
+
+        # 🔥 Top document (after limiting)
+        top_doc = limited_docs[0]
+
+        # ✅ Build context safely
+        context = "\n\n".join([d.page_content for d in limited_docs])
+
+        # ⚠️ EXTRA SAFETY (avoid very large prompts)
+        if len(context) > 3000:
+            context = context[:3000]
+
+        # ✅ Prompt building
+        if mode == "summary":
+            prompt = f"""
+Summarize the following content:
+
+{context}
+"""
+
+        elif mode == "completion":
+            prompt = f"""
+Complete based on context:
+
+{context}
+
+Question:
+{question}
+"""
+
+        else:  # qa
+            prompt = f"""
+Answer the question using ONLY the context below.
+
+If the answer is NOT present, say:
+"There is no information in the provided documents."
 
 Context:
 {context}
 
-Question: {question}
+Question:
+{question}
 """
 
-    elif mode == "completion":
-        return f"Continue this text:\n{question}"
+        # ✅ Get provider (Gemini / Ollama / OpenAI)
+        provider = get_provider(provider_name)
 
-    else:
-        return f"""Use the following context to respond.
+        print(f"🚀 Using provider: {provider_name}")
+        print(f"📏 Context length: {len(context)}")
 
-Context:
-{context}
+        # 🔥 Generate answer
+        answer = provider.generate(prompt)
 
-User: {question}
-"""
+        # ✅ Metadata
+        source = top_doc.metadata.get("source", "unknown")
 
+        # ✅ SMART SCORE
+        answer_lower = answer.lower()
 
-def generate_answer(question: str, mode: str, provider_name: str):
+        if (
+            "no information" in answer_lower
+            or "not mentioned" in answer_lower
+            or "not available" in answer_lower
+        ):
+            score = 0.0
+        else:
+            score = (
+                top_doc.metadata.get("score")
+                or top_doc.metadata.get("similarity")
+                or 0.75
+            )
 
-    docs = retrieve_docs(question)
-
-    if not docs:
         return {
-            "answer": "Your question is outside the context of the uploaded document.",
-            "sources": []
+            "answer": answer,
+            "source": source,
+            "score": float(score)
         }
 
-    similarities = []
+    except Exception as e:
+        print("🔥 CHAIN ERROR:", str(e))
 
-    for d in docs:
-        distance = d.metadata.get("score", 1)
-        similarity = 1 - distance
-        similarities.append(similarity)
-
-    best_similarity = max(similarities)
-
-    # 🔥 Improved out-of-context detection
-    if best_similarity < 0.65:
         return {
-            "answer": "Your question is outside the context of the uploaded document.",
-            "sources": []
+            "answer": f"Failed to generate answer: {str(e)}",
+            "source": "error",
+            "score": 0.0
         }
-
-    context = "\n\n".join([d.page_content for d in docs])
-
-    prompt = build_prompt(context, question, mode)
-
-    provider = get_provider(provider_name)
-
-    answer = provider.generate(prompt)
-
-    sources = []
-
-    for d in docs:
-
-        distance = d.metadata.get("score", 1)
-        similarity = (1 - distance) * 100
-
-        sources.append({
-            "file": d.metadata.get("source"),
-            "page": d.metadata.get("page"),
-            "score": round(similarity, 2),
-            "excerpt": d.page_content[:120]
-        })
-
-    return {
-        "answer": answer,
-        "sources": sources
-    }
