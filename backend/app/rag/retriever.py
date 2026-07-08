@@ -1,31 +1,50 @@
 from .vector_store import vector_store
 
 
-def retrieve_docs(query: str, k: int = 5, filename: str = None):
+def retrieve_docs(query: str, k: int = 8, filename: str = None):
     """
-    Retrieve top-k relevant documents from the vector store
-    Supports optional filename filtering
+    Retrieve relevant repository documents from ChromaDB.
+
+    Supports:
+    - filename filtering
+    - similarity scores
+    - sorting
     """
 
-    # ✅ WITH FILE FILTER
-    if filename:
-        results = vector_store.similarity_search_with_score(
-            query,
-            k=k,
-            filter={"source": filename}   # 🔥 IMPORTANT
+    try:
+
+        if filename:
+            results = vector_store.similarity_search_with_score(
+                query=query,
+                k=k,
+                filter={"source": filename},
+            )
+        else:
+            results = vector_store.similarity_search_with_score(
+                query=query,
+                k=k,
+            )
+
+        docs = []
+
+        for doc, distance in results:
+
+            similarity = 1 / (1 + distance)
+
+            doc.metadata["score"] = similarity
+
+            docs.append(doc)
+
+        # Highest similarity first
+        docs.sort(
+            key=lambda d: d.metadata.get("score", 0),
+            reverse=True,
         )
-    else:
-        results = vector_store.similarity_search_with_score(query, k=k)
 
-    docs = []
+        return docs
 
-    for doc, distance in results:
-        # ✅ Convert distance → similarity score (0 to 1)
-        similarity = 1 / (1 + distance)
+    except Exception as e:
 
-        # Save score inside metadata
-        doc.metadata["score"] = similarity
+        print("Retriever Error:", str(e))
 
-        docs.append(doc)
-
-    return docs
+        return []

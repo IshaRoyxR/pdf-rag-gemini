@@ -1,7 +1,8 @@
-# ==============================
+# =====================================
 # Python
-# ==============================
+# =====================================
 venv/
+.venv/
 __pycache__/
 *.pyc
 *.pyo
@@ -9,46 +10,59 @@ __pycache__/
 *.db
 *.sqlite3
 
-# ==============================
+# =====================================
 # Environment Variables
-# ==============================
+# =====================================
 .env
 
-# ==============================
-# Vector Databases
-# ==============================
-chroma_langchain_db/
-chrome_langchain_db/
+# =====================================
+# ChromaDB / Vector Database
+# =====================================
+backend/chroma_db/
+chroma_db/
 backend/data/chroma_db/
 data/chroma_db/
+chroma_langchain_db/
+chrome_langchain_db/
 
-# ==============================
-# Uploaded Documents (ignore actual files)
-# ==============================
-data/uploads/*
-backend/data/uploads/*
-!data/uploads/.gitkeep
+# =====================================
+# Uploaded Repositories / Documents
+# =====================================
+backend/uploads/
+uploads/
+backend/data/uploads/
+data/uploads/
+
+# Keep empty folders (optional)
+!backend/uploads/.gitkeep
+!uploads/.gitkeep
 !backend/data/uploads/.gitkeep
+!data/uploads/.gitkeep
 
-# ==============================
+# =====================================
 # Node / React
-# ==============================
+# =====================================
 node_modules/
 frontend/node_modules/
 
-# ==============================
-# OS Files
-# ==============================
-.DS_Store
-Thumbs.db
+# =====================================
+# Build Files
+# =====================================
+dist/
+build/
 
-# ==============================
+# =====================================
 # Logs
-# ==============================
+# =====================================
 *.log
 
-# ==============================
+# =====================================
 # VS Code
-# ==============================
+# =====================================
 .vscode/
-backend/chroma_db/
+
+# =====================================
+# Operating System Files
+# =====================================
+.DS_Store
+Thumbs.db

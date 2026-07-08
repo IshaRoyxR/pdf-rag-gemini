@@ -7,8 +7,8 @@ class OllamaProvider(BaseLLMProvider):
 
     def __init__(self):
         self.model = "llama3"
-        self.base_url = "http://127.0.0.1:11434"
-
+        self.base_url = "http://host.docker.internal:11434"
+        
         print(f"🚀 Using Ollama at {self.base_url}")
 
         self.llm = Ollama(

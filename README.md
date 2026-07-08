@@ -1,197 +1,146 @@
-# PDF RAG System — Multi-Format Intelligent Document Understanding Platform
+# 🚀 Infra AI Assistant
 
-A production-ready full-stack Retrieval-Augmented Generation (RAG) platform that enables users to upload PDF, DOCX, and PowerPoint documents and interact with them using context-aware AI conversations.
+An AI-powered Infrastructure Repository Assistant that analyzes DevOps repositories using Retrieval-Augmented Generation (RAG) and Large Language Models (LLMs).
 
-Built using FastAPI, LangChain, ChromaDB, React, Docker, Ollama, OpenAI, and Gemini.
-
----
-
-# Overview
-
-This project demonstrates how modern AI systems combine:
-- semantic retrieval
-- vector databases
-- conversational memory
-- multi-provider LLM orchestration
-- scalable backend architecture
-
-to build intelligent document understanding systems.
-
-Instead of building a basic chatbot wrapper, this project focuses on production-oriented AI infrastructure and full-stack engineering principles.
+The assistant understands infrastructure repositories containing Docker, Kubernetes, Terraform, Nginx, CI/CD pipelines, environment files, logs, and configuration files. Users can upload an infrastructure repository as a ZIP file and ask natural language questions to receive intelligent, context-aware explanations and recommendations.
 
 ---
 
-# Core Capabilities
+# ✨ Features
 
-- Multi-format document ingestion (PDF, DOCX, PPT/PPTX)
-- Retrieval-Augmented Generation (RAG)
-- Semantic search using vector embeddings
-- Context-aware conversational AI
-- Multi-provider LLM integration
-- Source-cited answer generation
-- Conversational memory support
-- Modular backend architecture
-- Dockerized full-stack deployment
-- Production-ready API workflows
+- 📦 Upload complete infrastructure repositories as ZIP files
+- 🤖 AI-powered repository analysis using RAG
+- ☸️ Kubernetes manifest analysis
+- 🐳 Docker & Docker Compose analysis
+- 🌍 Terraform configuration analysis
+- 🌐 Nginx configuration analysis
+- 🔄 Basic CI/CD workflow analysis
+- 🔐 Infrastructure security analysis
+- 🔗 Relationship detection between infrastructure components
+- 📄 Repository summary generation
+- 🧠 Multi-provider LLM support (Gemini, Ollama, OpenAI)
+- 💬 Interactive chat interface
+- 🐳 Dockerized deployment
 
 ---
 
-# System Architecture
+# 🏗️ Architecture
 
 ```text
-User
-│
-▼
-React + Vite Frontend
-│
-▼
-FastAPI Backend
-│
-├── Document Processing Pipeline
-│ ├── PDF Loader
-│ ├── DOCX Loader
-│ └── PPT Extractor
-│
-▼
-Text Chunking + Embedding Generation
-│
-▼
-ChromaDB Vector Store
-│
-▼
-Semantic Retriever
-│
-▼
-LLM Provider Layer
-│ ├── Ollama
-│ ├── OpenAI
-│ └── Gemini
-│
-▼
-Conversation Memory + Context Injection
-│
-▼
-Grounded AI Response with Source Citations
+                    User
+                      │
+                      ▼
+             React Frontend (Vite)
+                      │
+                 FastAPI Backend
+                      │
+             Upload Repository ZIP
+                      │
+             Extract Repository Files
+                      │
+              Repository Parser
+      ┌──────────┬──────────┬──────────┐
+      ▼          ▼          ▼          ▼
+ Kubernetes   Docker    Terraform   Nginx
+      │
+      ▼
+ Relationship Engine
+      │
+      ▼
+ Security Analyzer
+      │
+      ▼
+ Text Chunking
+      │
+      ▼
+ Chroma Vector Database
+      │
+      ▼
+ LangChain Retriever
+      │
+      ▼
+ Gemini / Ollama / OpenAI
+      │
+      ▼
+ AI Generated Response
 ```
 
 ---
 
-# Tech Stack
+# 🛠️ Tech Stack
 
 ## Backend
+
 - FastAPI
+- Python
 - LangChain
 - ChromaDB
-- Python
 - Docker
-- Ollama
-- OpenAI API
-- Gemini API
 
 ## Frontend
+
 - React
-- Vite
 - TypeScript
+- Vite
 - Tailwind CSS
 - shadcn/ui
 
----
+## AI
 
-# Key Engineering Features
-
-## AI / RAG Features
-- Retrieval-Augmented Generation (RAG)
-- Semantic similarity search
-- Embedding-based retrieval
-- Conversational memory
-- Multi-turn contextual Q&A
-- Source-aware answer generation
-- Relevance scoring
-- Multi-provider LLM orchestration
-
-## Backend Engineering
-- Modular FastAPI architecture
-- Async API workflows
-- Background document processing
-- Provider abstraction layer
-- Factory design pattern
-- Environment-based configuration
-- Production-ready Docker setup
-
-## Frontend Features
-- Modern React + Vite UI
-- Drag-and-drop document upload
-- Conversation session management
-- Multi-mode AI interaction
-- Source citation display
-- Provider selection interface
-- Responsive UI components
-
----
-
-# Supported LLM Providers
-
+- Gemini
 - Ollama
 - OpenAI
-- Gemini
-
-The provider layer is dynamically configurable and supports switching between local and cloud-hosted LLMs.
 
 ---
 
-# Project Structure
+# 📂 Project Structure
 
 ```text
-pdf-rag-gemini/
+infra-ai-assistant/
 │
 ├── backend/
 │   ├── app/
 │   │   ├── api/
+│   │   ├── analyzer/
+│   │   ├── parsers/
+│   │   ├── prompts/
 │   │   ├── rag/
-│   │   ├── providers/
-│   │   ├── memory/
 │   │   └── main.py
-│   │
 │   └── requirements.txt
 │
 ├── frontend/
-│   ├── src/
-│   ├── public/
-│   └── components/
 │
-├── data/
 ├── docker-compose.yml
-├── .env.example
+├── README.md
+├── RESULT.md
 ├── LICENSE
-└── README.md
+└── .env.example
 ```
 
 ---
 
-# Setup Guide
+# 🚀 Installation
 
-## 1. Clone Repository
+## Clone Repository
 
 ```bash
-git clone https://github.com/IshaRoyxR/pdf-rag-gemini.git
+git clone https://github.com/IshaRoyxR/infra-ai-assistant.git
 
-cd pdf-rag-gemini
+cd infra-ai-assistant
 ```
 
 ---
 
-## 2. Install Ollama
-
-Download:
-https://ollama.com/download
-
-Pull model:
+## Install Ollama
 
 ```bash
 ollama pull llama3
+ollama pull nomic-embed-text
 ```
 
-Start Ollama:
+---
+
+## Start Ollama
 
 ```bash
 ollama serve
@@ -199,19 +148,25 @@ ollama serve
 
 ---
 
-## 3. Configure Environment Variables
+## Configure Environment
 
-Create `.env` file:
+Create:
 
-```bash
-copy .env.example .env
+```text
+.env
 ```
 
-Update API keys if required.
+using:
+
+```text
+.env.example
+```
+
+Add your Gemini/OpenAI API keys if required.
 
 ---
 
-# 4. Start Full Stack Application
+## Run Application
 
 ```bash
 docker compose up --build
@@ -219,49 +174,62 @@ docker compose up --build
 
 ---
 
-# Application URLs
+# 🌐 Application URLs
 
-Frontend:
-```text
+Frontend
+
+```
 http://localhost:8080
 ```
 
-Backend:
-```text
+Backend
+
+```
 http://localhost:8000
 ```
 
-Swagger API Docs:
-```text
+Swagger
+
+```
 http://localhost:8000/docs
 ```
 
 ---
 
-# Example Use Cases
+# 💬 Example Questions
 
-- AI document assistants
-- Enterprise knowledge retrieval
-- Research paper Q&A systems
-- Internal AI copilots
-- Technical documentation assistants
-- Conversational knowledge systems
-
----
-
-# Future Improvements
-
-- Hybrid search (BM25 + vector search)
-- Authentication & user management
-- Streaming LLM responses
-- Multi-document reasoning
-- Kubernetes deployment
-- Redis caching
-- Cloud deployment support
-- Agentic workflows
+- Explain this repository.
+- Explain the deployment flow.
+- Find security issues.
+- Explain the Dockerfile.
+- Explain the Kubernetes resources.
+- Explain Terraform resources.
+- Which services communicate?
+- What ports are exposed?
+- How does Nginx route traffic?
+- Suggest infrastructure improvements.
 
 ---
 
-# License
+# 📸 Demo
+
+Upload an infrastructure repository ZIP and interact with the assistant using natural language to analyze Docker, Kubernetes, Terraform, Nginx, and CI/CD configurations.
+
+---
+
+# 🔮 Future Improvements
+
+- Helm Chart support
+- AWS CloudFormation support
+- Azure ARM/Bicep support
+- Better security rule engine
+- Multi-repository comparison
+- Streaming responses
+- Authentication
+- Cloud deployment
+
+---
+
+# 📄 License
 
 Apache License 2.0

@@ -211,6 +211,7 @@ function ChatBots() {
                 <input
                   ref={fileRef}
                   type="file"
+                  accept=".zip"
                   className="hidden"
                   onChange={(e) => setFile(e.target.files?.[0] || null)}
                 />

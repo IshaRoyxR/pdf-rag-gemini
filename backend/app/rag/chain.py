@@ -1,5 +1,6 @@
 from app.rag.retriever import retrieve_docs
 from app.rag.providers.factory import get_provider
+from app.prompts.system_prompt import SYSTEM_PROMPT
 
 
 def generate_answer(
@@ -10,78 +11,98 @@ def generate_answer(
 ):
 
     try:
-        # ✅ Retrieve documents (WITH FILE FILTER)
+        # Retrieve documents (WITH FILE FILTER)
         if filename:
             docs = retrieve_docs(question, filename=filename)
         else:
             docs = retrieve_docs(question)
 
-        # ✅ No docs found
+        # No documents found
         if not docs:
             return {
-                "answer": "No relevant information found in the selected document.",
+                "answer": "No relevant information found in the selected repository.",
                 "source": None,
                 "score": 0.0
             }
 
-        # 🔥 LIMIT CONTEXT (CRITICAL FIX FOR OLLAMA)
-        limited_docs = docs[:2]   # 👈 prevents overload/crash
+        # Limit retrieved documents
+        limited_docs = docs[:2]
 
-        # 🔥 Top document (after limiting)
+        # Top document
         top_doc = limited_docs[0]
 
-        # ✅ Build context safely
-        context = "\n\n".join([d.page_content for d in limited_docs])
+        # Build context
+        context = "\n\n".join(
+            [doc.page_content for doc in limited_docs]
+        )
 
-        # ⚠️ EXTRA SAFETY (avoid very large prompts)
-        if len(context) > 3000:
-            context = context[:3000]
+        # Prevent huge prompts
+        if len(context) > 5000:
+            context = context[:5000]
 
-        # ✅ Prompt building
+        # -----------------------------
+        # Prompt Building
+        # -----------------------------
+
         if mode == "summary":
+
             prompt = f"""
-Summarize the following content:
+{SYSTEM_PROMPT}
+
+Repository Context
 
 {context}
+
+Task
+
+Summarize the entire infrastructure repository.
 """
 
         elif mode == "completion":
+
             prompt = f"""
-Complete based on context:
+{SYSTEM_PROMPT}
+
+Repository Context
 
 {context}
 
-Question:
+Task
+
+Complete the following request.
+
+User Request
+
 {question}
 """
 
-        else:  # qa
+        else:
+
             prompt = f"""
-Answer the question using ONLY the context below.
+{SYSTEM_PROMPT}
 
-If the answer is NOT present, say:
-"There is no information in the provided documents."
+Repository Context
 
-Context:
 {context}
 
-Question:
+User Question
+
 {question}
 """
 
-        # ✅ Get provider (Gemini / Ollama / OpenAI)
+        # Get provider
         provider = get_provider(provider_name)
 
-        print(f"🚀 Using provider: {provider_name}")
-        print(f"📏 Context length: {len(context)}")
+        print(f"Using provider: {provider_name}")
+        print(f"Context Length: {len(context)}")
 
-        # 🔥 Generate answer
+        # Generate answer
         answer = provider.generate(prompt)
 
-        # ✅ Metadata
+        # Metadata
         source = top_doc.metadata.get("source", "unknown")
 
-        # ✅ SMART SCORE
+        # Similarity score
         answer_lower = answer.lower()
 
         if (
@@ -104,7 +125,8 @@ Question:
         }
 
     except Exception as e:
-        print("🔥 CHAIN ERROR:", str(e))
+
+        print("CHAIN ERROR:", str(e))
 
         return {
             "answer": f"Failed to generate answer: {str(e)}",
